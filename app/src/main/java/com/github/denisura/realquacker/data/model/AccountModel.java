@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 import org.parceler.Parcel;
 
 @Parcel
-public class Account {
+public class AccountModel {
 
     @SerializedName("id")
     @Expose

@@ -1,11 +1,13 @@
 package com.github.denisura.realquacker.ui.authenticator;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +34,6 @@ public class LoginFragment extends Fragment {
     private OAuthConsumer mConsumer;
     private String mAuthUrl;
     public Button mConnectBtn;
-
 
     private void initTwitter() {
 
@@ -84,6 +85,11 @@ public class LoginFragment extends Fragment {
                 Timber.d("Clicked on mConnectBtn %s", mAuthUrl);
                 CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
                         .addDefaultShareMenuItem()
+                        .setToolbarColor(ContextCompat.getColor(getContext(), R.color.colorPrimary))
+                        .setCloseButtonIcon(BitmapFactory.decodeResource(getResources(),
+                                R.drawable.ic_arrow_back_white_24dp))
+                        .setStartAnimations(getContext(), R.anim.slide_in_right, R.anim.slide_out_left)
+                        .setExitAnimations(getContext(), R.anim.slide_in_left, R.anim.slide_out_right)
                         .build();
 
                 CustomTabActivityHelper.openCustomTab(getActivity(), customTabsIntent, Uri.parse(mAuthUrl),

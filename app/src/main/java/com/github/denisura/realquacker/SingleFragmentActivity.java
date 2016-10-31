@@ -1,21 +1,24 @@
 package com.github.denisura.realquacker;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
-import com.github.denisura.realquacker.databinding.ActivityFragmentBinding;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();
 
     public Fragment mActivityFragment;
-    // Store the binding
-    protected ActivityFragmentBinding binding;
+    private Unbinder unbinder;
+
+    @BindView(R.id.toolbar)
+    public Toolbar mToolbar;
 
     @LayoutRes
     protected int getLayoutResId() {
@@ -26,8 +29,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = DataBindingUtil.setContentView(this, getLayoutResId());
-        setSupportActionBar(binding.toolbar);
+        setContentView(getLayoutResId());
+        unbinder = ButterKnife.bind(this);
+        setSupportActionBar(mToolbar);
 
         FragmentManager fm = getSupportFragmentManager();
         mActivityFragment = fm.findFragmentById(R.id.fragment_container);
@@ -38,5 +42,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, mActivityFragment)
                     .commit();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        unbinder.unbind();
+        super.onDestroy();
     }
 }

@@ -1,5 +1,6 @@
 package com.github.denisura.realquacker.ui.authenticator;
 
+import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.content.Context;
@@ -13,9 +14,10 @@ import com.github.denisura.realquacker.R;
 import com.github.denisura.realquacker.RealQuackerApplication;
 import com.github.denisura.realquacker.SingleFragmentActivity;
 import com.github.denisura.realquacker.account.AppAccount;
-import com.github.denisura.realquacker.data.model.Account;
+import com.github.denisura.realquacker.data.model.AccountModel;
 import com.github.denisura.realquacker.data.network.TwitterApi;
 import com.github.denisura.realquacker.data.network.TwitterService;
+import com.github.denisura.realquacker.data.sync.QuackerSyncAdapter;
 
 import java.io.IOException;
 
@@ -45,23 +47,30 @@ public class AuthenticatorActivity extends SingleFragmentActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent)
-    {
+    protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Timber.d("new intent");
         Uri uri = intent.getData();
         if (uri != null) {
-            onOAuthCallback(uri);
+            Timber.d("new intent url %s", uri.toString());
+            if (uri.getQueryParameter("oauth_verifier") != null) {
+                onOAuthCallback(uri);
+            }
+            if (uri.getQueryParameter("denied") != null) {
+                Timber.d("Boo denied");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, createFragment())
+                        .commit();
+            }
         }
     }
 
     private void onOAuthCallback(final Uri uri) {
         mConsumer = RealQuackerApplication.getOAuthConsumer();
         mProvider = RealQuackerApplication.getOAuthProvider();
-        new AsyncTask<Void, Void, Account>() {
+        new AsyncTask<Void, Void, Bundle>() {
 
             @Override
-            protected Account doInBackground(Void... voids) {
+            protected Bundle doInBackground(Void... voids) {
                 String pinCode = uri.getQueryParameter("oauth_verifier");
                 try {
                     mProvider.retrieveAccessToken(mConsumer, pinCode);
@@ -70,14 +79,15 @@ public class AuthenticatorActivity extends SingleFragmentActivity {
                     String tokenSecret = mConsumer.getTokenSecret();
 
                     TwitterApi _apiService = TwitterService.newService(token, tokenSecret);
-                    Call<Account> call = _apiService.getAccountDetails();
-                    Account account = call.execute().body();
-                    account.token = mConsumer.getToken();
-                    account.tokenSecret = mConsumer.getTokenSecret();
+                    Call<AccountModel> call = _apiService.getAccountDetails();
+                    AccountModel accountModel = call.execute().body();
 
-                    Timber.d("Username %s", account.screenName);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("token", mConsumer.getToken());
+                    bundle.putString("tokenSecret", mConsumer.getTokenSecret());
+                    bundle.putString("screenName", accountModel.screenName);
 
-                    return account;
+                    return bundle;
                 } catch (OAuthMessageSignerException
                         | OAuthNotAuthorizedException
                         | OAuthExpectationFailedException
@@ -89,25 +99,19 @@ public class AuthenticatorActivity extends SingleFragmentActivity {
             }
 
             @Override
-            protected void onPostExecute(Account account) {
+            protected void onPostExecute(Bundle bundle) {
                 final AccountManager am = AccountManager.get(AuthenticatorActivity.this);
                 final Bundle result = new Bundle();
-                AppAccount newAccount = new AppAccount(account.screenName);
-                Bundle bundle = new Bundle();
-                bundle.putString("token", account.token);
-                bundle.putString("tokenSecret", account.tokenSecret);
+                Account newAccount = new Account(bundle.getString("screenName"), AppAccount.TYPE);
                 if (am.addAccountExplicitly(newAccount, null, bundle)) {
                     result.putString(AccountManager.KEY_ACCOUNT_NAME, newAccount.name);
                     result.putString(AccountManager.KEY_ACCOUNT_TYPE, newAccount.type);
-                    am.setAuthToken(newAccount, AUTHTOKEN_TYPE_FULL_ACCESS, account.token);
+                    am.setAuthToken(newAccount, AUTHTOKEN_TYPE_FULL_ACCESS, bundle.getString("token"));
+                    QuackerSyncAdapter.syncImmediately(newAccount);
                 } else {
                     result.putString(AccountManager.KEY_ERROR_MESSAGE, getString(R.string.account_already_exists));
                 }
-
-
-
-
-                Timber.d("Save token and account and finish");
+                Timber.d("Save token and accountModel and finish");
                 setAccountAuthenticatorResult(result);
                 setResult(RESULT_OK);
                 finish();
@@ -117,11 +121,6 @@ public class AuthenticatorActivity extends SingleFragmentActivity {
 
     @Override
     protected Fragment createFragment() {
-
-        Uri uri = this.getIntent().getData();
-        if (uri != null) {
-            return SuccessFragment.newInstance();
-        }
         return LoginFragment.newInstance();
     }
 

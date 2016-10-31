@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Real Quacker</string>
-    <string name="login_label">Sign In</string>
+    <string name="login_label">Connect with Twitter</string>
     <string name="account_already_exists">Account already exists</string>
+    <string name="compose">Compose</string>
+    <string name="prompt_message">Message:</string>
+    <string name="slogan">Make quacking great again \n #MQGA</string>
 
 </resources>

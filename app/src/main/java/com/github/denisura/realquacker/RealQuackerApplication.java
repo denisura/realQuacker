@@ -6,6 +6,8 @@ import android.os.StrictMode;
 
 import com.squareup.leakcanary.LeakCanary;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
 import oauth.signpost.basic.DefaultOAuthConsumer;
@@ -33,6 +35,7 @@ public class RealQuackerApplication extends Application {
         LeakCanary.install(this);
         Timber.plant(new Timber.DebugTree());
         RealQuackerApplication.mContext = this;
+        JodaTimeAndroid.init(this);
     }
 
 
@@ -67,4 +70,6 @@ public class RealQuackerApplication extends Application {
         }
         return mProvider;
     }
+
+
 }

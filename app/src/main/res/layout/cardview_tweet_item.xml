@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackground"
+    android:padding="0dp"
+    card_view:cardCornerRadius="@dimen/cardview_corner_radius"
+    card_view:cardElevation="@dimen/cardview_default_elevation"
+    card_view:cardUseCompatPadding="false">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/profileUrl"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:padding="@dimen/cardview_default_padding" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_toEndOf="@+id/profileUrl"
+            android:layout_toRightOf="@+id/profileUrl"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:paddingLeft="@dimen/cardview_default_padding"
+            android:paddingStart="@dimen/cardview_default_padding"
+            android:text=""
+            android:textStyle="bold"
+            tools:text="Bob Marley" />
+
+        <TextView
+            android:id="@+id/screen_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/name"
+            android:layout_gravity="center_horizontal"
+            android:layout_toEndOf="@+id/profileUrl"
+            android:layout_toRightOf="@+id/profileUrl"
+            android:paddingLeft="@dimen/cardview_default_padding"
+            android:paddingStart="@dimen/cardview_default_padding"
+            android:text=""
+            tools:text="@relax" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/screen_name"
+            android:layout_gravity="center_horizontal"
+            android:layout_toEndOf="@+id/profileUrl"
+            android:layout_toRightOf="@+id/profileUrl"
+            android:autoLink="all"
+            android:linksClickable="true"
+            android:padding="@dimen/cardview_default_padding"
+            android:text=""
+            tools:text="Android Development" />
+
+        <TextView
+            android:id="@+id/created_at"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center_horizontal"
+            android:padding="@dimen/cardview_default_padding"
+            android:text=""
+            tools:text="1 min ago" />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
