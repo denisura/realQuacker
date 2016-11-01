@@ -45,5 +45,11 @@
                 android:maxLength="140"
                 android:maxLines="6" />
         </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:text="@string/default_counter_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/counter" />
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

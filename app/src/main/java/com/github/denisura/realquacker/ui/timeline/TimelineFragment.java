@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public RecyclerView mRecyclerView;
+    public SwipeRefreshLayout mSwipeRefreshLayout;
     public TimelineAdapter mAdapter;
 
     @Override
@@ -53,6 +55,18 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         mRecyclerView.setLayoutManager(recyclerViewLayoutManager);
         mAdapter = new TimelineAdapter(getContext(), null);
         mRecyclerView.setAdapter(mAdapter);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                Account account = AccountUtils.getCurrentAccount(getContext());
+                if (account != null) {
+                    QuackerSyncAdapter.syncImmediately(account);
+                }
+            }
+        });
 
 
         scrollListener = new EndlessRecyclerViewScrollListener(recyclerViewLayoutManager) {
@@ -74,13 +88,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         return rootView;
     }
 
-    public void loadNextDataFromApi(int offset) {
-        Timber.d("Offset %d", offset);
-        Account account = AccountUtils.getCurrentAccount(getContext());
-        if (account != null) {
-            // QuackerSyncAdapter.syncImmediately(account);
-        }
-    }
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -155,6 +163,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             return;
         }
+        mSwipeRefreshLayout.setRefreshing(refreshing);
     }
 
     /**

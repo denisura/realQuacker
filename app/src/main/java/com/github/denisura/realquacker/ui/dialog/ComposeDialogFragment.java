@@ -15,6 +15,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.github.denisura.realquacker.R;
 import com.github.denisura.realquacker.data.database.AppContract;
@@ -48,12 +51,12 @@ public class ComposeDialogFragment extends DialogFragment {
     private Unbinder unbinder;
 
     private static final String ARG_TITLE = "title";
-    private static final String ARG_ITEM = "item";
-    private static final String DIALOG_DATE = "DialogDate";
-    private static final int REQUEST_DATE = 0;
-
     @BindView(R.id.notes)
     public TextInputEditText mNotes;
+
+    @BindView(R.id.counter)
+    public TextView mCounter;
+
 
     public ComposeDialogFragment() {
     }
@@ -70,7 +73,7 @@ public class ComposeDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.dialog_save_task, container, false);
+        View rootView = inflater.inflate(R.layout.dialog_compose, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
@@ -86,6 +89,18 @@ public class ComposeDialogFragment extends DialogFragment {
         }
         setHasOptionsMenu(true);
 
+        TextWatcher mTextEditorWatcher = new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mCounter.setText(String.valueOf(140 - s.length()));
+            }
+
+            public void afterTextChanged(Editable s) {
+            }
+        };
+        mNotes.addTextChangedListener(mTextEditorWatcher);
         return rootView;
     }
 
