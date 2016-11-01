@@ -57,9 +57,9 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src="https://github.com/denisura/realquacker/blob/master/walkthrough.gif?raw=true" title='Video Walkthrough' width="200"  data-load="full">
 
-GIF created with [LiceCap](http://www.cockos.com/licecap/).
+[Video Walkthrough](https://www.youtube.com/watch?v=wkt_JFCl43o)
 
 ## Notes
 
