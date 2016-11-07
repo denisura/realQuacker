@@ -14,14 +14,8 @@ import com.github.denisura.realquacker.data.model.Tweet;
 public class TimelineAdapter extends CursorRecyclerViewAdapter<TweetViewHolder>
          {
 
-
-    private Context mContext;
-    public long mSelected = -1;
-
-
     public TimelineAdapter(Context context, Cursor cursor) {
         super(context, cursor);
-        mContext = context;
     }
 
     @Override

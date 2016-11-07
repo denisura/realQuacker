@@ -15,8 +15,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();
 
     public Fragment mActivityFragment;
-    private Unbinder unbinder;
-
+    protected Unbinder unbinder;
     @BindView(R.id.toolbar)
     public Toolbar mToolbar;
 
@@ -43,6 +42,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                     .commit();
         }
     }
+
+
+
 
     @Override
     public void onDestroy() {

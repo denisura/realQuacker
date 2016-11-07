@@ -2,6 +2,7 @@ package com.github.denisura.realquacker.data.model;
 
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import com.github.denisura.realquacker.data.database.UserColumns;
 import com.google.gson.annotations.Expose;
@@ -129,6 +130,32 @@ public class User {
         contentValues.put(UserColumns.STATUSES_COUNT, getStatusesCount());
         contentValues.put(UserColumns.PROFILE_IAMGE_URL, getProfileImageUrl());
         return contentValues;
+    }
+
+
+    public static User fromCursor(Cursor cursor) {
+
+        int idx_id = cursor.getColumnIndex(UserColumns._ID);
+        int idx_name = cursor.getColumnIndex(UserColumns.NAME);
+        int idx_screen_name = cursor.getColumnIndex(UserColumns.SCREEN_NAME);
+        int idx_description = cursor.getColumnIndex(UserColumns.DESCRIPTION);
+        int idx_followers_count = cursor.getColumnIndex(UserColumns.FOLLOWERS_COUNT);
+        int idx_friends_count = cursor.getColumnIndex(UserColumns.FRIENDS_COUNT);
+        int idx_favorites_count = cursor.getColumnIndex(UserColumns.FAVOURITES_COUNT);
+        int idx_statuses_count = cursor.getColumnIndex(UserColumns.STATUSES_COUNT);
+        int idx_profile_image_url = cursor.getColumnIndex(UserColumns.PROFILE_IAMGE_URL);
+
+        User user = new User();
+        user.setId(cursor.getLong(idx_id));
+        user.setName(cursor.getString(idx_name));
+        user.setScreenName(cursor.getString(idx_screen_name));
+        user.setProfileImageUrl(cursor.getString(idx_profile_image_url));
+        user.setDescription(cursor.getString(idx_description));
+        user.setFollowersCount(cursor.getInt(idx_followers_count));
+        user.setFriendsCount(cursor.getInt(idx_friends_count));
+        user.setFavouritesCount(cursor.getInt(idx_favorites_count));
+        user.setStatusesCount(cursor.getInt(idx_statuses_count));
+        return user;
     }
 
 }

@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-
     <!-- Permissions required by the sync adapter -->
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
@@ -24,16 +23,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.timeline.TimelineActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+        <activity
+            android:name=".ui.timeline.TimelineActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.authenticator.AuthenticatorActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -52,7 +50,6 @@
                     android:host="cprealquacker"
                     android:scheme="oauth" />
             </intent-filter>
-
         </activity>
 
         <service
@@ -71,20 +68,30 @@
         <!-- The SyncAdapter service -->
         <service
             android:name=".data.sync.QuackerSyncService"
-            android:exported="true"
-            >
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
+                <action android:name="android.content.SyncAdapter" />
             </intent-filter>
+
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter"/>
+                android:resource="@xml/syncadapter" />
         </service>
 
         <provider
+            android:name=".provider.AppProvider"
             android:authorities="com.github.denisura.realquacker"
-            android:exported="false"
-            android:name=".provider.AppProvider"/>
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:parentActivityName=".ui.timeline.TimelineActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.denisura.realquacker.ui.timeline.TimelineActivity" />
+        </activity>
     </application>
 
 </manifest>

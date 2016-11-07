@@ -3,23 +3,29 @@ package com.github.denisura.realquacker.ui.authenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
+import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 
 import com.github.denisura.realquacker.R;
 import com.github.denisura.realquacker.RealQuackerApplication;
 import com.github.denisura.realquacker.SingleFragmentActivity;
 import com.github.denisura.realquacker.account.AppAccount;
-import com.github.denisura.realquacker.data.model.AccountModel;
+import com.github.denisura.realquacker.data.database.AppContract;
+import com.github.denisura.realquacker.data.database.AppProvider;
+import com.github.denisura.realquacker.data.model.User;
 import com.github.denisura.realquacker.data.network.TwitterApi;
 import com.github.denisura.realquacker.data.network.TwitterService;
 import com.github.denisura.realquacker.data.sync.QuackerSyncAdapter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
@@ -79,13 +85,29 @@ public class AuthenticatorActivity extends SingleFragmentActivity {
                     String tokenSecret = mConsumer.getTokenSecret();
 
                     TwitterApi _apiService = TwitterService.newService(token, tokenSecret);
-                    Call<AccountModel> call = _apiService.getAccountDetails();
-                    AccountModel accountModel = call.execute().body();
+                    Call<User> call = _apiService.getAccountDetails();
+                    User user = call.execute().body();
+
+                    ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+                    ContentProviderOperation.Builder builder;
+                    builder = ContentProviderOperation.newInsert(AppProvider.Users.CONTENT_URI);
+                    builder.withValues(user.toContentValues());
+                    batch.add(builder.build());
+
+                    int operations = batch.size();
+                    if (operations > 0) {
+                        try {
+                            getContentResolver().applyBatch(AppContract.CONTENT_AUTHORITY, batch);
+                        } catch (RemoteException | OperationApplicationException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
                     Bundle bundle = new Bundle();
                     bundle.putString("token", mConsumer.getToken());
                     bundle.putString("tokenSecret", mConsumer.getTokenSecret());
-                    bundle.putString("screenName", accountModel.screenName);
+                    bundle.putString("screenName", user.getScreenName());
+                    bundle.putString("userId", Long.toString(user.getId()));
 
                     return bundle;
                 } catch (OAuthMessageSignerException
@@ -107,7 +129,7 @@ public class AuthenticatorActivity extends SingleFragmentActivity {
                     result.putString(AccountManager.KEY_ACCOUNT_NAME, newAccount.name);
                     result.putString(AccountManager.KEY_ACCOUNT_TYPE, newAccount.type);
                     am.setAuthToken(newAccount, AUTHTOKEN_TYPE_FULL_ACCESS, bundle.getString("token"));
-                    QuackerSyncAdapter.syncImmediately(newAccount);
+                    QuackerSyncAdapter.syncHomeTimelineImmediately(newAccount);
                 } else {
                     result.putString(AccountManager.KEY_ERROR_MESSAGE, getString(R.string.account_already_exists));
                 }

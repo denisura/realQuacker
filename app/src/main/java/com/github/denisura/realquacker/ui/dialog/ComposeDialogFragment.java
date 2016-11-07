@@ -166,7 +166,7 @@ public class ComposeDialogFragment extends DialogFragment {
                             }
                         }
 
-                        QuackerSyncAdapter.syncImmediately(account);
+                        QuackerSyncAdapter.syncHomeTimelineImmediately(account);
                         dismiss();
                     }
 

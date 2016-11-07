@@ -19,9 +19,13 @@ public final class AppDatabase {
 
     public static class Tables {
         @Table(TweetColumns.class)
-        public static final String TWEETS = AppContract.TweetEntry.TABLE_NAME;
+        public static final String TWEETS = AppContract.HomeTimelineEntry.TABLE_NAME;
         @Table(UserColumns.class)
         public static final String USERS = AppContract.UserEntry.TABLE_NAME;
+        @Table(TweetColumns.class)
+        public static final String MENTIONS = AppContract.MentionsTimelineEntry.TABLE_NAME;
+//        @Table(TimelineColumns.class)
+//        public static final String TIMELINE = AppContract.TimelineEntry.TABLE_NAME;
     }
 
     @OnCreate
@@ -33,6 +37,8 @@ public final class AppDatabase {
                                  int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + Tables.TWEETS);
         db.execSQL("DROP TABLE IF EXISTS " + Tables.USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + Tables.MENTIONS);
+//        db.execSQL("DROP TABLE IF EXISTS " + Tables.TIMELINE);
         onCreate(context, db);
     }
 }

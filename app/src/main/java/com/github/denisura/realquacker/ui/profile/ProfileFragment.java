@@ -1,9 +1,10 @@
-package com.github.denisura.realquacker.ui.timeline;
+package com.github.denisura.realquacker.ui.profile;
 
 
 import android.accounts.Account;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.SyncStatusObserver;
 import android.database.Cursor;
 import android.os.Build;
@@ -23,26 +24,41 @@ import com.github.denisura.realquacker.R;
 import com.github.denisura.realquacker.account.AppAccount;
 import com.github.denisura.realquacker.data.database.AppContract;
 import com.github.denisura.realquacker.data.database.AppProvider;
+import com.github.denisura.realquacker.data.model.User;
 import com.github.denisura.realquacker.data.sync.QuackerSyncAdapter;
 import com.github.denisura.realquacker.ui.EndlessRecyclerViewScrollListener;
+import com.github.denisura.realquacker.ui.timeline.TimelineAdapter;
 import com.github.denisura.realquacker.utils.AccountUtils;
 
 import timber.log.Timber;
 
-public class TimelineFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int TIMELINE_LOADER = 0;
+    public static final int PROFILE_LOADER = 1;
 
     private EndlessRecyclerViewScrollListener scrollListener;
-    Account mAccount;
 
-    public static TimelineFragment newInstance() {
-        return new TimelineFragment();
+    public static ProfileFragment newInstance() {
+        return new ProfileFragment();
     }
 
     public RecyclerView mRecyclerView;
     public SwipeRefreshLayout mSwipeRefreshLayout;
     public TimelineAdapter mAdapter;
+    private Callbacks mCallbacks;
+
+
+    public interface Callbacks {
+        void onProfileLoaded(User user);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,9 +76,9 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
             @Override
             public void onRefresh() {
                 // Refresh items
-                mAccount = AccountUtils.getCurrentAccount(getContext());
-                if (mAccount != null) {
-                    QuackerSyncAdapter.syncHomeTimelineImmediately(mAccount);
+                Account account = AccountUtils.getCurrentAccount(getContext());
+                if (account != null) {
+                    QuackerSyncAdapter.syncHomeTimelineImmediately(account);
                 }
             }
         });
@@ -75,9 +91,9 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
                 // Add whatever code is needed to append new items to the bottom of the list
                 Timber.d("Last tweet id %d", mAdapter.getItemId(totalItemsCount - 1));
                 long maxId = mAdapter.getItemId(totalItemsCount - 1);
-                mAccount = AccountUtils.getCurrentAccount(getContext());
-                if (mAccount != null) {
-                    QuackerSyncAdapter.syncHomeTimelineImmediately(mAccount, maxId);
+                Account account = AccountUtils.getCurrentAccount(getContext());
+                if (account != null) {
+                    QuackerSyncAdapter.syncHomeTimelineImmediately(account, maxId);
                 }
             }
         };
@@ -88,15 +104,14 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Timber.d("onActivityCreated");
 
         getLoaderManager().initLoader(TIMELINE_LOADER, null, this);
+        getLoaderManager().initLoader(PROFILE_LOADER, null, this);
     }
-
 
     /**
      * Handle to a SyncObserver. The ProgressBar element is visible until the SyncObserver reports
@@ -112,22 +127,42 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
 
         Timber.d("onCreateLoader %s", AppProvider.Tweets.CONTENT_URI);
 
-        return new CursorLoader(getActivity(),
-                AppProvider.Tweets.CONTENT_URI,
-                AppProvider.Tweets.PROJECTION,
-                null,
-                null,
-                null);
+        switch (id) {
+            case PROFILE_LOADER:
+                return new CursorLoader(getActivity(),
+                        AppProvider.Users.withId("denisura"),
+                        null,
+                        null,
+                        null,
+                        null);
+
+            case TIMELINE_LOADER:
+                return new CursorLoader(getActivity(),
+                        AppProvider.Tweets.CONTENT_URI,
+                        AppProvider.Tweets.PROJECTION,
+                        null,
+                        null,
+                        null);
+        }
+        return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Timber.d("onLoadFinished %d", data.getCount());
-        if (data.getCount() == 0) {
-            QuackerSyncAdapter.syncHomeTimelineImmediately(mAccount);
-        }
 
-        mAdapter.swapCursor(data);
+        switch (loader.getId()) {
+            case PROFILE_LOADER:
+                Timber.d("onLoadFinished profile %d", data.getCount());
+                data.moveToFirst();
+                User profile = User.fromCursor(data);
+                mCallbacks.onProfileLoaded(profile);
+
+                break;
+            case TIMELINE_LOADER:
+                Timber.d("onLoadFinished %d", data.getCount());
+                mAdapter.swapCursor(data);
+                break;
+        }
     }
 
     @Override
@@ -135,8 +170,15 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
 
         Timber.d("onLoaderReset");
 
-        if (mAdapter != null) {
-            mAdapter.changeCursor(null);
+        switch (loader.getId()) {
+            case PROFILE_LOADER:
+                Timber.d("onLoaderReset profile");
+                break;
+            case TIMELINE_LOADER:
+                if (mAdapter != null) {
+                    mAdapter.changeCursor(null);
+                }
+                break;
         }
     }
 
@@ -203,9 +245,17 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onDestroyView() {
+        mAdapter = null;
         if (mRecyclerView != null) {
             mRecyclerView.setAdapter(null);
         }
         super.onDestroyView();
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
+
 }
