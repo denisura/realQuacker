@@ -56,6 +56,9 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
+<img src="https://github.com/denisura/realquacker/blob/master/walkthrough-2.gif?raw=true" title='Video Walkthrough' width="200"  data-load="full">
+
+[Video Walkthrough](https://youtu.be/PmFLt3qSydE)
 
 
 # Project 3 - *Real Quacker*
