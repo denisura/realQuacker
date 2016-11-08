@@ -38,7 +38,7 @@ public interface TwitterApi {
     Call<List<Tweet>> getUserTimeline(
             @Query("count") int count,
             @Query("max_id") long maxId,
-            @Query("user_id") long userId
+            @Query("screen_name") String screenName
     );
 
     @POST("1.1/statuses/update.json")

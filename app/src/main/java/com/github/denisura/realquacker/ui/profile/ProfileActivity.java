@@ -75,6 +75,7 @@ public class ProfileActivity extends SingleFragmentActivity
 
     @Override
     protected Fragment createFragment() {
+        Timber.d("mUsername %s", mUsername);
         return ProfileFragment.newInstance();
     }
 
@@ -82,10 +83,16 @@ public class ProfileActivity extends SingleFragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAppBarLayout.addOnOffsetChangedListener(this);
+
         final ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowTitleEnabled(false);
         startAlphaAnimation(mTitle, 0, View.INVISIBLE);
+
+        if (getIntent().hasExtra(EXTRA_USERNAME)) {
+            mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
+            ((ProfileFragment) mActivityFragment).mUsername = mUsername;
+        }
     }
 
     @Override
@@ -97,11 +104,7 @@ public class ProfileActivity extends SingleFragmentActivity
             return;
         }
 
-        if (getIntent().hasExtra(EXTRA_USERNAME)) {
-            mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
-        }
 
-        getSupportActionBar().setTitle(mUsername);
         QuackerSyncAdapter.syncHomeTimelineImmediately(account);
     }
 
@@ -128,16 +131,12 @@ public class ProfileActivity extends SingleFragmentActivity
 
     private void handleToolbarTitleVisibility(float percentage) {
 
-        Timber.d("Persantage %f", percentage);
         if (percentage >= PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR) {
-
             if (!mIsTheTitleVisible) {
                 startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
                 mIsTheTitleVisible = true;
             }
-
         } else {
-
             if (mIsTheTitleVisible) {
                 startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
                 mIsTheTitleVisible = false;
@@ -167,7 +166,15 @@ public class ProfileActivity extends SingleFragmentActivity
         mName.setText(user.getName());
         mScreenName.setText(user.getScreenName());
         mDescription.setText(user.getDescription());
-        mFollowers.setText(getResources().getString(R.string.format_followers,user.followersCount));
-        mFollowing.setText(getResources().getString(R.string.format_following,user.friendsCount));
+        mFollowers.setText(getResources().getString(R.string.format_followers, user.followersCount));
+        mFollowing.setText(getResources().getString(R.string.format_following, user.friendsCount));
+        mTitle.setText(user.getScreenName());
+    }
+
+
+    @Override
+    public void onDestroy() {
+        mAppBarLayout.addOnOffsetChangedListener(null);
+        super.onDestroy();
     }
 }

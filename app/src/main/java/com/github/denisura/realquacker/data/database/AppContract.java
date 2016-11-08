@@ -12,8 +12,9 @@ public class AppContract {
 
     public static final String PATH_TWEETS = "tweets";
     public static final String PATH_USERS = "users";
-//    public static final String PATH_MENTIONS = "mentions";
-//    public static final String PATH_TIMELINE = "timeline";
+    public static final String PATH_MENTIONS = "mentions";
+    public static final String PATH_TIMELINE = "timeline";
+    public static final String PATH_USERTWEET = "usertweet";
 
     public static final class HomeTimelineEntry implements TweetColumns {
         public static final String TABLE_NAME = "home_timeline";
@@ -40,11 +41,19 @@ public class AppContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USERS;
     }
 
-//    public static final class TimelineEntry implements TimelineColumns{
-//        public static final String TABLE_NAME = "timeline";
-//        public static final String CONTENT_TYPE =
-//                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TIMELINE;
-//        public static final String CONTENT_ITEM_TYPE =
-//                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TIMELINE;
-//    }
+    public static final class TimelineEntry implements TweetColumns{
+        public static final String TABLE_NAME = "timeline";
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TWEETS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TWEETS;
+    }
+
+    public static final class UserTweetEntry implements TimelineColumns {
+        public static final String TABLE_NAME = "user_tweet";
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USERTWEET;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USERTWEET;
+    }
 }

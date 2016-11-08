@@ -203,6 +203,7 @@ public class TimelineFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onDestroyView() {
+        mRecyclerView.addOnScrollListener(null);
         if (mRecyclerView != null) {
             mRecyclerView.setAdapter(null);
         }

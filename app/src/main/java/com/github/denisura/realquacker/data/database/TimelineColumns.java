@@ -6,6 +6,7 @@ import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.PrimaryKey;
 
 import static net.simonvt.schematic.annotation.DataType.Type.INTEGER;
+import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
 
 public interface TimelineColumns {
 
@@ -17,6 +18,6 @@ public interface TimelineColumns {
     @DataType(INTEGER)
     String TWEET_ID = "tweet_id";
 
-    @DataType(INTEGER)
-    String USER_ID = "user_id";
+    @DataType(TEXT)
+    String TIMELINE_USER = "timeline_user";
 }

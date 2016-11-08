@@ -52,6 +52,7 @@
             android:layout_toRightOf="@+id/profileUrl"
             android:paddingLeft="@dimen/cardview_default_padding"
             android:paddingStart="@dimen/cardview_default_padding"
+            android:clickable="true"
             android:text=""
             tools:text="@relax" />
 
